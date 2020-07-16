@@ -2,7 +2,6 @@ package com.lieeber.imoocvideo.service;
 
 import com.lieeber.imoocvideo.mapper.UsersMapper;
 import com.lieeber.imoocvideo.pojo.Users;
-import org.apache.catalina.User;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

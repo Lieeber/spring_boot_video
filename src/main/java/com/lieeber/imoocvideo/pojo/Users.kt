@@ -1,41 +1,40 @@
-package com.lieeber.imoocvideo.pojo;
+@file:JvmName("Users")
+package com.lieeber.imoocvideo.pojo
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
-import javax.persistence.Column;
-import javax.persistence.Id;
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+import lombok.Data
+import javax.persistence.Column
+import javax.persistence.Id
 
 @ApiModel(value = "用户对象", description = "这是用户对象")
-@Data
-public class Users {
+class Users {
     @ApiModelProperty(hidden = true)
     @Id
-    private String id;
+    var id: String? = null
 
     @ApiModelProperty(value = "用户名", name = "username", example = "imoocuser", required = true)
-    public String username;
+    var username: String? = null
 
     @ApiModelProperty(value = "密码", name = "password", example = "123456", required = true)
-    public String password;
+    var password: String? = null
 
     @ApiModelProperty(hidden = true)
     @Column(name = "face_image")
-    private String faceImage;
+    var faceImage: String? = null
 
     @ApiModelProperty(hidden = true)
-    private String nickname;
+    var nickname: String? = null
 
     @ApiModelProperty(hidden = true)
     @Column(name = "fans_counts")
-    private Integer fansCounts;
+    var fansCounts: Int? = null
 
     @ApiModelProperty(hidden = true)
     @Column(name = "follow_counts")
-    private Integer followCounts;
+    var followCounts: Int? = null
 
     @ApiModelProperty(hidden = true)
     @Column(name = "receive_like_counts")
-    private Integer receiveLikeCounts;
+    var receiveLikeCounts: Int? = null
 }
