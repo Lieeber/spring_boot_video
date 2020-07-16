@@ -15,10 +15,10 @@ public class Users {
     private String id;
 
     @ApiModelProperty(value = "用户名", name = "username", example = "imoocuser", required = true)
-    private String username;
+    public String username;
 
     @ApiModelProperty(value = "密码", name = "password", example = "123456", required = true)
-    private String password;
+    public String password;
 
     @ApiModelProperty(hidden = true)
     @Column(name = "face_image")
