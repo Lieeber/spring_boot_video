@@ -1,22 +1,27 @@
 package com.lieeber.imoocvideo.controller;
 
 import com.lieeber.imoocvideo.pojo.Users;
+import com.lieeber.imoocvideo.pojo.UsersVO;
 import com.lieeber.imoocvideo.service.UserService;
 import com.lieeber.imoocvideo.utils.IMoocJSONResult;
 import com.lieeber.imoocvideo.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @Api(value = "用户注册和登录接口", tags = "注册和登录的controller")
 @RequestMapping("user")
 @RestController
-public class RegisterLoginController {
+public class RegisterLoginController extends BasicController{
 
     @Autowired
     private UserService userService;
@@ -40,7 +45,18 @@ public class RegisterLoginController {
             return IMoocJSONResult.errorMsg("用户名已经存在，请换一个再试。");
         }
         users.setPassword("");
-        return IMoocJSONResult.ok(users);
+        UsersVO usersVO = saveToRedis(users);
+        return IMoocJSONResult.ok(usersVO);
+    }
+
+    @NotNull
+    private UsersVO saveToRedis(@RequestBody Users users) {
+        String uuid = UUID.randomUUID().toString();
+        getRedis().set(USER_REDIS_SESSION + ":" + uuid, users.getId());
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(users, usersVO);
+        usersVO.setUserToken(uuid);
+        return usersVO;
     }
 
 
@@ -54,7 +70,8 @@ public class RegisterLoginController {
         Users responseUser = userService.queryUserForLogin(users.getUsername(),MD5Utils.getMD5Str( users.getPassword()));
         if (responseUser != null) {
             responseUser.setPassword("");
-            return IMoocJSONResult.ok(responseUser);
+            UsersVO usersVO = saveToRedis(responseUser);
+            return IMoocJSONResult.ok(usersVO);
         }else{
             return IMoocJSONResult.errorMsg("没有找到该用户，请确认用户名或者密码是否有误。");
         }
