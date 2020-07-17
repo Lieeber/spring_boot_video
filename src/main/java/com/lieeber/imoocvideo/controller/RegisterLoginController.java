@@ -6,22 +6,20 @@ import com.lieeber.imoocvideo.service.UserService;
 import com.lieeber.imoocvideo.utils.IMoocJSONResult;
 import com.lieeber.imoocvideo.utils.MD5Utils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @Api(value = "用户注册和登录接口", tags = "注册和登录的controller")
 @RequestMapping("user")
 @RestController
-public class RegisterLoginController extends BasicController{
+public class RegisterLoginController extends BasicController {
 
     @Autowired
     private UserService userService;
@@ -49,16 +47,6 @@ public class RegisterLoginController extends BasicController{
         return IMoocJSONResult.ok(usersVO);
     }
 
-    @NotNull
-    private UsersVO saveToRedis(@RequestBody Users users) {
-        String uuid = UUID.randomUUID().toString();
-        getRedis().set(USER_REDIS_SESSION + ":" + uuid, users.getId());
-        UsersVO usersVO = new UsersVO();
-        BeanUtils.copyProperties(users, usersVO);
-        usersVO.setUserToken(uuid);
-        return usersVO;
-    }
-
 
     @ApiOperation(value = "用户登录", notes = "用户登录的接口")
     @PostMapping("/login")
@@ -67,13 +55,34 @@ public class RegisterLoginController extends BasicController{
                 || StringUtils.isBlank(users.getPassword())) {
             return IMoocJSONResult.errorMsg("用户名和密码不能为空");
         }
-        Users responseUser = userService.queryUserForLogin(users.getUsername(),MD5Utils.getMD5Str( users.getPassword()));
+        Users responseUser = userService.queryUserForLogin(users.getUsername(), MD5Utils.getMD5Str(users.getPassword()));
         if (responseUser != null) {
             responseUser.setPassword("");
             UsersVO usersVO = saveToRedis(responseUser);
             return IMoocJSONResult.ok(usersVO);
-        }else{
+        } else {
             return IMoocJSONResult.errorMsg("没有找到该用户，请确认用户名或者密码是否有误。");
         }
+    }
+
+
+    @ApiOperation(value = "用户注销", notes = "用户注销的接口")
+    @ApiImplicitParam(name = "userToken", value = "用户Token", required = true,
+            dataType = "String", paramType = "query")
+    @PostMapping("/logout")
+    public IMoocJSONResult logout(@RequestParam String userToken) throws Exception {
+        String userId = getRedis().get(USER_REDIS_SESSION + ":" + userToken);
+        getRedis().del((USER_REDIS_SESSION + ":" + userToken));
+        return IMoocJSONResult.ok("退出登录成功");
+    }
+
+    @NotNull
+    private UsersVO saveToRedis(@RequestBody Users users) {
+        String uuid = UUID.randomUUID().toString();
+        getRedis().set(USER_REDIS_SESSION + ":" + uuid, users.getId(), 60 * 30);
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(users, usersVO);
+        usersVO.setUserToken(uuid);
+        return usersVO;
     }
 }
