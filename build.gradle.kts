@@ -33,7 +33,7 @@ dependencies {
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3")
     implementation("org.springframework.boot:spring-boot-configuration-processor:2.3.1.RELEASE")
     implementation("org.projectlombok:lombok:1.16.8")
-    implementation("tk.mybatis:mapper-spring-boot-starter:1.2.4")
+    implementation("tk.mybatis:mapper-spring-boot-starter:2.1.5")
     implementation("com.github.pagehelper:pagehelper-spring-boot-starter:1.2.3")
     implementation("commons-codec:commons-codec:1.11")
     implementation("org.apache.commons:commons-lang3:3.4")

@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService {
     public void saveUser(Users user) {
         user.setId(sid.nextShort());
         usersMapper.insert(user);
-
     }
 
     @Override
