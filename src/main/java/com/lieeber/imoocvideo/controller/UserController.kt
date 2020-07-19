@@ -1,6 +1,7 @@
 package com.lieeber.imoocvideo.controller
 
 import com.lieeber.imoocvideo.pojo.Users
+import com.lieeber.imoocvideo.pojo.UsersVO
 import com.lieeber.imoocvideo.service.UserService
 import com.lieeber.imoocvideo.utils.IMoocJSONResult
 import io.swagger.annotations.Api
@@ -8,11 +9,9 @@ import io.swagger.annotations.ApiImplicitParam
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.apache.commons.io.IOUtils
+import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.FileOutputStream
@@ -22,18 +21,18 @@ import java.io.FileOutputStream
 @RequestMapping("user")
 class UserController : BasicController() {
     @Autowired
-    lateinit var userService:UserService
+    lateinit var userService: UserService
+
+
     @ApiOperation(value = "用户上传头像", notes = "用户上传头像的接口")
     @ApiImplicitParam(name = "userToken", value = "用户token", required = true, dataType = "String", paramType = "query")
-    @PostMapping("/upload_avatar",headers= ["content-type=multipart/form-data"])
-    fun uploadAvatar(@RequestParam userToken: String?,
-                     @ApiParam(name = "file",value = "file", required = true)
-                     @RequestParam("file") files: Array<MultipartFile>) :IMoocJSONResult{
+    @PostMapping("/upload_avatar", headers = ["content-type=multipart/form-data"])
+    fun uploadAvatar(@RequestParam userToken: String?, @ApiParam(name = "file", value = "file", required = true) @RequestParam("file") files: Array<MultipartFile>): IMoocJSONResult {
         if (userToken.isNullOrBlank()) {
             return IMoocJSONResult.errorMsg("用户没有登录，请重新登录")
         }
         val userId = redis?.get("$USER_REDIS_SESSION:$userToken")
-        if (userId.isNullOrBlank()){
+        if (userId.isNullOrBlank()) {
             return IMoocJSONResult.errorMsg("用户登录已过期，请重新登录")
         }
         if (files.isEmpty()) {
@@ -45,18 +44,18 @@ class UserController : BasicController() {
         val rootPath = "/Users/lieeber/Downloads/imoocvideo_save"
         val filePath = rootPath + path + fileName
         val dbPath = path + fileName
-        var fileOutputStream :FileOutputStream? = null
+        var fileOutputStream: FileOutputStream? = null
         try {
             val outFile = File(filePath)
             if (outFile.parentFile != null || !outFile.parentFile.isDirectory) {
                 outFile.parentFile.mkdirs()
             }
-            var fileOutputStream = FileOutputStream(outFile)
+            fileOutputStream = FileOutputStream(outFile)
             IOUtils.copy(file.inputStream, fileOutputStream)
 
         } catch (e: Exception) {
             return IMoocJSONResult.errorMsg("上传出错...")
-        }finally {
+        } finally {
             fileOutputStream?.flush()
             fileOutputStream?.close()
         }
@@ -66,5 +65,27 @@ class UserController : BasicController() {
         user.faceImage = dbPath
         userService.updateUserInfo(user)
         return IMoocJSONResult.ok(dbPath)
+    }
+
+
+    @GetMapping("/query")
+    fun getUserInfo(userId: String?, userToken: String?): IMoocJSONResult {
+        if (userId.isNullOrBlank()) {
+            return IMoocJSONResult.errorMsg("用户id不能为空")
+        }
+        val user = userService.queryUserInfo(userId)
+        if (user == null) {
+            return IMoocJSONResult.errorMsg("该用户不存在，请确认userId是否正确。")
+        }
+        var userVO = UsersVO()
+        BeanUtils.copyProperties(user, userVO)
+        //如果该用户是自己，还需要带上userToken
+        if (!userToken.isNullOrEmpty()) {
+            val myUserId = redis?.get("$USER_REDIS_SESSION:$userToken")
+            if (myUserId == userId) {
+                userVO.userToken = userToken
+            }
+        }
+        return IMoocJSONResult.ok(userVO)
     }
 }

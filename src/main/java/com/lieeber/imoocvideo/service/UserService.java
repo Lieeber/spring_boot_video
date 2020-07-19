@@ -10,4 +10,6 @@ public interface UserService {
     Users queryUserForLogin(String username, String password);
 
     void updateUserInfo(@NotNull Users user);
+
+    Users queryUserInfo(@NotNull String userId);
 }
