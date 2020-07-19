@@ -79,7 +79,7 @@ public class RegisterLoginController extends BasicController {
     @NotNull
     private UsersVO saveToRedis(@RequestBody Users users) {
         String uuid = UUID.randomUUID().toString();
-        getRedis().set(USER_REDIS_SESSION + ":" + uuid, users.getId(), 60 * 30);
+        getRedis().set(USER_REDIS_SESSION + ":" + uuid, users.getId());
         UsersVO usersVO = new UsersVO();
         BeanUtils.copyProperties(users, usersVO);
         usersVO.setUserToken(uuid);
