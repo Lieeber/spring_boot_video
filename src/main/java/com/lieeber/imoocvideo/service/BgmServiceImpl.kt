@@ -7,13 +7,18 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class BgmServiceImpl:BgmService {
+class BgmServiceImpl : BgmService {
 
     @Autowired
-    lateinit var bgmMapper:BgmMapper
+    lateinit var bgmMapper: BgmMapper
 
-    override fun queryBgmList(): List<Bgm> {
-        val bgmList = bgmMapper.selectAll()
+    override fun queryBgmList(): ArrayList<Bgm> {
+        val bgmList = bgmMapper.selectAll() as ArrayList
         return bgmList
+    }
+
+    override fun queryBgmById(bgmId: String): Bgm? {
+        val bgm = bgmMapper.selectByPrimaryKey(bgmId)
+        return bgm
     }
 }

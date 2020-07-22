@@ -1,5 +1,6 @@
 package com.lieeber.imoocvideo.controller
 
+import com.lieeber.imoocvideo.Constants.rootPath
 import com.lieeber.imoocvideo.pojo.Users
 import com.lieeber.imoocvideo.pojo.UsersVO
 import com.lieeber.imoocvideo.service.UserService
@@ -23,7 +24,6 @@ class UserController : BasicController() {
     @Autowired
     lateinit var userService: UserService
 
-
     @ApiOperation(value = "用户上传头像", notes = "用户上传头像的接口")
     @ApiImplicitParam(name = "userToken", value = "用户token", required = true, dataType = "String", paramType = "query")
     @PostMapping("/upload_avatar", headers = ["content-type=multipart/form-data"])
@@ -41,7 +41,6 @@ class UserController : BasicController() {
         val file = files[0]
         val fileName = file.originalFilename
         val path = "/${userId}/userAvatar/"
-        val rootPath = "/Users/lieeber/Downloads/imoocvideo_save"
         val filePath = rootPath + path + fileName
         val dbPath = path + fileName
         var fileOutputStream: FileOutputStream? = null
