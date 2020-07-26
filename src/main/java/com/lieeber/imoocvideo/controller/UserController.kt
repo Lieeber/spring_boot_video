@@ -21,6 +21,7 @@ import java.io.FileOutputStream
 @RestController
 @RequestMapping("user")
 class UserController : BasicController() {
+
     @Autowired
     lateinit var userService: UserService
 
