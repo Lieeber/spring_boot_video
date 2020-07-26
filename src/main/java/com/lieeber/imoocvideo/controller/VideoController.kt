@@ -1,6 +1,7 @@
 package com.lieeber.imoocvideo.controller
 
 import com.lieeber.imoocvideo.Constants.rootPath
+import com.lieeber.imoocvideo.enums.VideoStatusEnum
 import com.lieeber.imoocvideo.pojo.Videos
 import com.lieeber.imoocvideo.service.BgmService
 import com.lieeber.imoocvideo.service.VideoService
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.FileOutputStream
+import java.time.Duration
+import java.util.*
 
 @RestController
 @RequestMapping("video")
@@ -27,12 +30,10 @@ class VideoController : BasicController() {
     @Autowired
     lateinit var bgmService: BgmService
 
-    @Autowired
-    lateinit var sid: Sid
-
     @PostMapping("/upload")
     fun uploadVideo(userToken: String?, bgmId: String?,
                     videoWidth: Int?, videoHeight: Int?, desc: String?,
+                    duration: Float,
                     @RequestParam("file") file: MultipartFile?): IMoocJSONResult {
         if (userToken.isNullOrBlank()) {
             return IMoocJSONResult.errorMsg("用户没有登录，请重新登录")
@@ -45,7 +46,7 @@ class VideoController : BasicController() {
             return IMoocJSONResult.errorMsg("视频上传失败，请重新上传")
         }
         val fileName = file.originalFilename
-        val path = File.separator+"${userId}${File.separator}userVideo${File.separator}"
+        val path = File.separator + "${userId}${File.separator}userVideo${File.separator}"
         val filePath = rootPath + path + fileName
         val dbPath = path + fileName
         var fileOutputStream: FileOutputStream? = null
@@ -64,11 +65,11 @@ class VideoController : BasicController() {
             fileOutputStream?.close()
         }
 
-        if (!bgmId.isNullOrEmpty()){
+        if (!bgmId.isNullOrEmpty()) {
             val bgm = bgmService.queryBgmById(bgmId)
             if (bgm != null) {  //如果查询到的bgm不为空，就将视频和音频合并
-                val videoPath = rootPath  + dbPath
-                val audioPath = rootPath+ bgm.path
+                val videoPath = rootPath + dbPath
+                val audioPath = rootPath + bgm.path
                 val substring = fileName!!.substring(2)
                 val endPath = rootPath + path + substring  //原视频和目标视频不能是同路径同名字
                 val ffmpeg = MergeVideoMp3("C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe")
@@ -77,14 +78,16 @@ class VideoController : BasicController() {
         }
 
         val videos = Videos()
-        videos.id = sid.nextShort()
+        videos.audioId = bgmId
         videos.userId = userId
-        videos.status = 1
+        videos.status = VideoStatusEnum.SUCCESS.ordinal
+        videos.videoHeight = videoHeight
+        videos.videoWidth = videoWidth
+        videos.createTime = Date()
+        videos.videoSeconds = duration.toFloat()
         videos.videoPath = dbPath
-        if (!bgmId.isNullOrBlank()) {
-            videos.audioId = bgmId
-        }
-//        videoService.
+        videos.videoDesc = desc
+        videoService.saveVideo(videos)
         return IMoocJSONResult.ok(dbPath)
     }
 }
