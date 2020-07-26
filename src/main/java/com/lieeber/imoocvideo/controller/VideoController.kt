@@ -1,5 +1,6 @@
 package com.lieeber.imoocvideo.controller
 
+import com.lieeber.imoocvideo.Constants.ffmpegPath
 import com.lieeber.imoocvideo.Constants.rootPath
 import com.lieeber.imoocvideo.pojo.Videos
 import com.lieeber.imoocvideo.service.BgmService
@@ -71,7 +72,7 @@ class VideoController : BasicController() {
                 val audioPath = rootPath+ bgm.path
                 val substring = fileName!!.substring(2)
                 val endPath = rootPath + path + substring  //原视频和目标视频不能是同路径同名字
-                val ffmpeg = MergeVideoMp3("C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe")
+                val ffmpeg = MergeVideoMp3(ffmpegPath)
                 ffmpeg.convertor(videoPath, audioPath, endPath)
             }
         }
@@ -84,7 +85,8 @@ class VideoController : BasicController() {
         if (!bgmId.isNullOrBlank()) {
             videos.audioId = bgmId
         }
-//        videoService.
+        //保存视频信息到数据库
+        videoService.saveVideo(videos)
         return IMoocJSONResult.ok(dbPath)
     }
 }
