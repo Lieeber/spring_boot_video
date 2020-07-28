@@ -6,19 +6,15 @@ import com.lieeber.imoocvideo.enums.VideoStatusEnum
 import com.lieeber.imoocvideo.pojo.Videos
 import com.lieeber.imoocvideo.service.BgmService
 import com.lieeber.imoocvideo.service.VideoService
+import com.lieeber.imoocvideo.utils.FetchVideoCover
 import com.lieeber.imoocvideo.utils.IMoocJSONResult
 import com.lieeber.imoocvideo.utils.MergeVideoMp3
 import org.apache.commons.io.IOUtils
-import org.n3r.idworker.Sid
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.FileOutputStream
-import java.time.Duration
 import java.util.*
 
 @RestController
@@ -46,13 +42,12 @@ class VideoController : BasicController() {
         if (file == null) {
             return IMoocJSONResult.errorMsg("视频上传失败，请重新上传")
         }
-        val fileName = file.originalFilename
-        val path = File.separator + "${userId}${File.separator}userVideo${File.separator}"
-        val filePath = rootPath + path + fileName
-        val dbPath = path + fileName
+        val videoFileName = file.originalFilename
+        val videoRelativePath = File.separator + "${userId}${File.separator}userVideo${File.separator}"
+        val videoFileAbsolutePath = rootPath + videoRelativePath + videoFileName
         var fileOutputStream: FileOutputStream? = null
         try {
-            val outFile = File(filePath)
+            val outFile = File(videoFileAbsolutePath)
             if (outFile.parentFile != null || !outFile.parentFile.isDirectory) {
                 outFile.parentFile.mkdirs()
             }
@@ -66,29 +61,44 @@ class VideoController : BasicController() {
             fileOutputStream?.close()
         }
 
+        //如果选择了背景音乐，就将背景音乐和当前视频合成一个视频
         if (!bgmId.isNullOrEmpty()) {
             val bgm = bgmService.queryBgmById(bgmId)
             if (bgm != null) {  //如果查询到的bgm不为空，就将视频和音频合并
-                val videoPath = rootPath + dbPath
-                val audioPath = rootPath + bgm.path
-                val substring = fileName!!.substring(2)
-                val endPath = rootPath + path + substring  //原视频和目标视频不能是同路径同名字
                 val ffmpeg = MergeVideoMp3(ffmpegPath)
-                ffmpeg.convertor(videoPath, audioPath, endPath)
+                ffmpeg.convertor(videoFileAbsolutePath, rootPath + bgm.path,
+                        rootPath + videoRelativePath + UUID.randomUUID() + ".mp4")
             }
         }
 
+        //生成视频封面图
+        val coverFileName = videoFileName!!.split(".")[0] + ".jpg"
+        val coverFileAbsolutePath = rootPath + videoRelativePath + coverFileName
+        val fetchVideoCover = FetchVideoCover(ffmpegPath)
+        fetchVideoCover.getCover(videoFileAbsolutePath, coverFileAbsolutePath)
         val videos = Videos()
         videos.audioId = bgmId
         videos.userId = userId
-        videos.status = VideoStatusEnum.SUCCESS.ordinal
+        videos.status = VideoStatusEnum.SUCCESS.ordinal + 1
         videos.videoHeight = videoHeight
         videos.videoWidth = videoWidth
         videos.createTime = Date()
         videos.videoSeconds = duration.toFloat()
-        videos.videoPath = dbPath
+        videos.videoPath = videoRelativePath + videoFileName
+        videos.coverPath = videoRelativePath + coverFileName
         videos.videoDesc = desc
         videoService.saveVideo(videos)
-        return IMoocJSONResult.ok(dbPath)
+        return IMoocJSONResult.ok(videoRelativePath + videoFileName)
     }
+
+
+    @GetMapping("/showAll")
+    fun showAllVideos(@RequestParam("page", defaultValue = "1") page: Int,
+                      @RequestParam("pageSize", defaultValue = "10") pageSize: Int): IMoocJSONResult {
+        println("" + page + "::" + pageSize)
+        val allVideos = videoService.getAllVideos(page, pageSize)
+        return IMoocJSONResult.ok(allVideos)
+    }
+
+//    @GetMapping("")
 }

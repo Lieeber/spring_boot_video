@@ -2,7 +2,7 @@ package com.lieeber.imoocvideo.controller
 
 import com.lieeber.imoocvideo.Constants.rootPath
 import com.lieeber.imoocvideo.pojo.Users
-import com.lieeber.imoocvideo.pojo.UsersVO
+import com.lieeber.imoocvideo.pojo.vo.UsersVO
 import com.lieeber.imoocvideo.service.UserService
 import com.lieeber.imoocvideo.utils.IMoocJSONResult
 import io.swagger.annotations.Api

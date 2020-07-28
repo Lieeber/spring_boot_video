@@ -1,6 +1,6 @@
 @file:JvmName("Users")
 
-package com.lieeber.imoocvideo.pojo
+package com.lieeber.imoocvideo.pojo.vo
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.annotations.ApiModel
