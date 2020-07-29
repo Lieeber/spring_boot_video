@@ -1,5 +1,6 @@
 package com.lieeber.imoocvideo.controller
 
+import com.lieeber.imoocvideo.configuration.MyConfiguration
 import com.lieeber.imoocvideo.pojo.Users
 import com.lieeber.imoocvideo.service.UserService
 import com.lieeber.imoocvideo.utils.RedisOperator
@@ -15,12 +16,11 @@ class HelloController : BasicController() {
     @Autowired
     var userService: UserService? = null
 
-    @Autowired
-    lateinit  var demo:MyInterface
 
+    @Autowired
+    lateinit  var configuration:MyConfiguration
     @GetMapping("/get")
     fun hello(): String {
-        demo.onPrint()
-        return "访问成功了。"
+        return configuration.toString()
     }
 }
