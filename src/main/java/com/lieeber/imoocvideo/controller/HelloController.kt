@@ -15,14 +15,12 @@ class HelloController : BasicController() {
     @Autowired
     var userService: UserService? = null
 
+    @Autowired
+    lateinit  var demo:MyInterface
+
     @GetMapping("/get")
     fun hello(): String {
-        var user = Users()
-        user.username = "fdfd"
-        user.password = "fdfdfd"
-        val nameIsExit = userService?.queryUserNameIsExit(user.username)
-        var token = UUID.randomUUID().toString()
-        redis!!.set(USER_REDIS_SESSION + ":" + "ffff", token)
-        return "访问成功了:$nameIsExit:${  redis!!.get(USER_REDIS_SESSION + ":" + "ffff")}"
+        demo.onPrint()
+        return "访问成功了。"
     }
 }

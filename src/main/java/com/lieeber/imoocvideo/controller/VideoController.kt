@@ -27,6 +27,7 @@ class VideoController : BasicController() {
     @Autowired
     lateinit var bgmService: BgmService
 
+
     @PostMapping("/upload")
     fun uploadVideo(userToken: String?, bgmId: String?,
                     videoWidth: Int?, videoHeight: Int?, desc: String?,
@@ -93,12 +94,20 @@ class VideoController : BasicController() {
 
 
     @GetMapping("/showAll")
-    fun showAllVideos(@RequestParam("page", defaultValue = "1") page: Int,
-                      @RequestParam("pageSize", defaultValue = "10") pageSize: Int): IMoocJSONResult {
+    fun showAllVideos(
+            videoDesc: String?,
+            @RequestParam("page", defaultValue = "1") page: Int,
+            @RequestParam("pageSize", defaultValue = "10") pageSize: Int): IMoocJSONResult {
         println("" + page + "::" + pageSize)
-        val allVideos = videoService.getAllVideos(page, pageSize)
+        val allVideos = videoService.getAllVideos(videoDesc, page, pageSize)
         return IMoocJSONResult.ok(allVideos)
     }
 
-//    @GetMapping("")
+
+    @GetMapping("/hot")
+    fun getHot(): IMoocJSONResult {
+        val hotWords = videoService.getHotWords()
+        return IMoocJSONResult.ok(hotWords)
+    }
+
 }

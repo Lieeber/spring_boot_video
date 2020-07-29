@@ -2,8 +2,10 @@ package com.lieeber.imoocvideo.service
 
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
+import com.lieeber.imoocvideo.mapper.SearchRecordsMapper
 import com.lieeber.imoocvideo.mapper.VideosMapper
 import com.lieeber.imoocvideo.mapper.VideosMapperCustom
+import com.lieeber.imoocvideo.pojo.SearchRecords
 import com.lieeber.imoocvideo.pojo.Videos
 import com.lieeber.imoocvideo.pojo.vo.VideosVO
 import com.lieeber.imoocvideo.utils.PagedResult
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import tk.mybatis.mapper.entity.Example
 
 @Service
 class VideoServiceImpl : VideoService {
@@ -24,6 +27,10 @@ class VideoServiceImpl : VideoService {
 
 
     @Autowired
+    lateinit var searchRecordsMapper: SearchRecordsMapper
+
+
+    @Autowired
     lateinit var sid: Sid
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -33,9 +40,9 @@ class VideoServiceImpl : VideoService {
         videosMapper.insertSelective(videos)
     }
 
-    override fun getAllVideos(page: Int, pageSize: Int): PagedResult {
+    override fun getAllVideos(videoDesc: String?, page: Int, pageSize: Int): PagedResult {
         PageHelper.startPage<VideosVO>(page, pageSize)
-        val list = videosMapperCustom.queryAllVideos()
+        val list = videosMapperCustom.queryAllVideos(videoDesc)
         val pageList = PageInfo<VideosVO>(list)
         val pageResult = PagedResult()
         pageResult.page = page
@@ -43,5 +50,10 @@ class VideoServiceImpl : VideoService {
         pageResult.rows = list
         pageResult.records = pageList.total
         return pageResult
+    }
+
+    override fun getHotWords(): ArrayList<String> {
+        val hotWords = searchRecordsMapper.getHotWords()
+        return hotWords
     }
 }
