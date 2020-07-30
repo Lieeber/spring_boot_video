@@ -1,5 +1,6 @@
 package com.lieeber.imoocvideo.controller
 
+import com.lieeber.imoocvideo.configuration.FirstConfiguration
 import com.lieeber.imoocvideo.configuration.MyConfiguration
 import com.lieeber.imoocvideo.pojo.Users
 import com.lieeber.imoocvideo.service.UserService
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.lang.Exception
 import java.util.*
 
 @RestController
@@ -19,6 +21,11 @@ class HelloController : BasicController() {
 
     @Autowired
     lateinit  var configuration:MyConfiguration
+
+    @Autowired
+    lateinit  var firstConfiguration: FirstConfiguration
+
+
     @GetMapping("/get")
     fun hello(): String {
         return configuration.toString()

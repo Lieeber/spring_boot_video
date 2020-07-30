@@ -4,9 +4,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
 import org.springframework.stereotype.Component
+import org.springframework.web.bind.annotation.ControllerAdvice
 
 
-@PropertySource(value = ["classpath:config/my_configuration.properties"])
+@PropertySource(value = ["classpath:config/my_configuration2.properties"])
 @ConfigurationProperties(prefix = "li")
 @Component
 class MyConfiguration {
