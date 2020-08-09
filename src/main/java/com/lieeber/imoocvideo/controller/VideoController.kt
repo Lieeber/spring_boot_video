@@ -7,7 +7,7 @@ import com.lieeber.imoocvideo.pojo.Videos
 import com.lieeber.imoocvideo.service.BgmService
 import com.lieeber.imoocvideo.service.VideoService
 import com.lieeber.imoocvideo.utils.FetchVideoCover
-import com.lieeber.imoocvideo.utils.IMoocJSONResult
+import com.lieeber.imoocvideo.utils.UnifyResponse
 import com.lieeber.imoocvideo.utils.MergeVideoMp3
 import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,16 +32,16 @@ class VideoController : BasicController() {
     fun uploadVideo(userToken: String?, bgmId: String?,
                     videoWidth: Int?, videoHeight: Int?, desc: String?,
                     duration: Float,
-                    @RequestParam("file") file: MultipartFile?): IMoocJSONResult {
+                    @RequestParam("file") file: MultipartFile?): UnifyResponse {
         if (userToken.isNullOrBlank()) {
-            return IMoocJSONResult.errorMsg("用户没有登录，请重新登录")
+            return UnifyResponse.errorMsg("用户没有登录，请重新登录")
         }
         val userId = redis?.get("${BasicController.USER_REDIS_SESSION}:$userToken")
         if (userId.isNullOrBlank()) {
-            return IMoocJSONResult.errorMsg("用户登录已过期，请重新登录")
+            return UnifyResponse.errorMsg("用户登录已过期，请重新登录")
         }
         if (file == null) {
-            return IMoocJSONResult.errorMsg("视频上传失败，请重新上传")
+            return UnifyResponse.errorMsg("视频上传失败，请重新上传")
         }
         val videoFileName = file.originalFilename
         val videoRelativePath = File.separator + "${userId}${File.separator}userVideo${File.separator}"
@@ -56,7 +56,7 @@ class VideoController : BasicController() {
             IOUtils.copy(file.inputStream, fileOutputStream)
 
         } catch (e: Exception) {
-            return IMoocJSONResult.errorMsg("上传出错...")
+            return UnifyResponse.errorMsg("上传出错...")
         } finally {
             fileOutputStream?.flush()
             fileOutputStream?.close()
@@ -89,7 +89,7 @@ class VideoController : BasicController() {
         videos.coverPath = videoRelativePath + coverFileName
         videos.videoDesc = desc
         videoService.saveVideo(videos)
-        return IMoocJSONResult.ok(videoRelativePath + videoFileName)
+        return UnifyResponse.ok(videoRelativePath + videoFileName)
     }
 
 
@@ -97,17 +97,17 @@ class VideoController : BasicController() {
     fun showAllVideos(
             videoDesc: String?,
             @RequestParam("page", defaultValue = "1") page: Int,
-            @RequestParam("pageSize", defaultValue = "10") pageSize: Int): IMoocJSONResult {
+            @RequestParam("pageSize", defaultValue = "10") pageSize: Int): UnifyResponse {
         println("" + page + "::" + pageSize)
         val allVideos = videoService.getAllVideos(videoDesc, page, pageSize)
-        return IMoocJSONResult.ok(allVideos)
+        return UnifyResponse.ok(allVideos)
     }
 
 
     @GetMapping("/hot")
-    fun getHot(): IMoocJSONResult {
+    fun getHot(): UnifyResponse {
         val hotWords = videoService.getHotWords()
-        return IMoocJSONResult.ok(hotWords)
+        return UnifyResponse.ok(hotWords)
     }
 
 }

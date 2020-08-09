@@ -46,6 +46,7 @@ dependencies {
     implementation("redis.clients:jedis:3.3.0")
     implementation("org.springframework.data:spring-data-redis:2.3.1.RELEASE")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.3.2.RELEASE")
     runtimeOnly ("mysql:mysql-connector-java:8.0.20")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")

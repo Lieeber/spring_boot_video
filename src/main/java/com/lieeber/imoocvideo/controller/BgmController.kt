@@ -3,7 +3,7 @@ package com.lieeber.imoocvideo.controller
 import com.lieeber.imoocvideo.Constants
 import com.lieeber.imoocvideo.pojo.Bgm
 import com.lieeber.imoocvideo.service.BgmService
-import com.lieeber.imoocvideo.utils.IMoocJSONResult
+import com.lieeber.imoocvideo.utils.UnifyResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -19,7 +19,7 @@ class BgmController : BasicController() {
     lateinit var bgmService: BgmService
 
     @GetMapping("/list")
-    fun bgmList(): IMoocJSONResult {
+    fun bgmList(): UnifyResponse {
         val queryBgmList = bgmService.queryBgmList()
 //        if (queryBgmList.isEmpty()) {//如果数据库的数据是空，就获取文件夹下面的文件，从而知道数据
 //            val dir = File(Constants.rootPath + File.separator + "bgm")
@@ -38,6 +38,6 @@ class BgmController : BasicController() {
 //                }
 //            }
 //        }
-        return IMoocJSONResult.ok(queryBgmList)
+        return UnifyResponse.ok(queryBgmList)
     }
 }

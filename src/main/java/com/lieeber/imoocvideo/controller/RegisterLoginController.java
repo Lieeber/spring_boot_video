@@ -3,7 +3,7 @@ package com.lieeber.imoocvideo.controller;
 import com.lieeber.imoocvideo.pojo.Users;
 import com.lieeber.imoocvideo.pojo.vo.UsersVO;
 import com.lieeber.imoocvideo.service.UserService;
-import com.lieeber.imoocvideo.utils.IMoocJSONResult;
+import com.lieeber.imoocvideo.utils.UnifyResponse;
 import com.lieeber.imoocvideo.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -26,10 +26,10 @@ public class RegisterLoginController extends BasicController {
 
     @ApiOperation(value = "用户注册", notes = "用户注册的接口")
     @PostMapping("/register")
-    public IMoocJSONResult register(@RequestBody Users users) throws Exception {
+    public UnifyResponse register(@RequestBody Users users) throws Exception {
         if (StringUtils.isBlank(users.getUsername())
                 || StringUtils.isBlank(users.getPassword())) {
-            return IMoocJSONResult.errorMsg("用户名和密码不能为空");
+            return UnifyResponse.errorMsg("用户名和密码不能为空");
         }
         boolean userNameIsExit = userService.queryUserNameIsExit(users.getUsername());
         if (!userNameIsExit) {
@@ -40,28 +40,28 @@ public class RegisterLoginController extends BasicController {
             users.setReceiveLikeCounts(0);
             userService.saveUser(users);
         } else {
-            return IMoocJSONResult.errorMsg("用户名已经存在，请换一个再试。");
+            return UnifyResponse.errorMsg("用户名已经存在，请换一个再试。");
         }
         users.setPassword("");
         UsersVO usersVO = saveToRedis(users);
-        return IMoocJSONResult.ok(usersVO);
+        return UnifyResponse.ok(usersVO);
     }
 
 
     @ApiOperation(value = "用户登录", notes = "用户登录的接口")
     @PostMapping("/login")
-    public IMoocJSONResult login(@RequestBody Users users) throws Exception {
+    public UnifyResponse login(@RequestBody Users users) throws Exception {
         if (StringUtils.isBlank(users.getUsername())
                 || StringUtils.isBlank(users.getPassword())) {
-            return IMoocJSONResult.errorMsg("用户名和密码不能为空");
+            return UnifyResponse.errorMsg("用户名和密码不能为空");
         }
         Users responseUser = userService.queryUserForLogin(users.getUsername(), MD5Utils.getMD5Str(users.getPassword()));
         if (responseUser != null) {
             responseUser.setPassword("");
             UsersVO usersVO = saveToRedis(responseUser);
-            return IMoocJSONResult.ok(usersVO);
+            return UnifyResponse.ok(usersVO);
         } else {
-            return IMoocJSONResult.errorMsg("没有找到该用户，请确认用户名或者密码是否有误。");
+            return UnifyResponse.errorMsg("没有找到该用户，请确认用户名或者密码是否有误。");
         }
     }
 
@@ -70,10 +70,10 @@ public class RegisterLoginController extends BasicController {
     @ApiImplicitParam(name = "userToken", value = "用户Token", required = true,
             dataType = "String", paramType = "query")
     @PostMapping("/logout")
-    public IMoocJSONResult logout(@RequestParam String userToken) throws Exception {
+    public UnifyResponse logout(@RequestParam String userToken) throws Exception {
         String userId = getRedis().get(USER_REDIS_SESSION + ":" + userToken);
         getRedis().del((USER_REDIS_SESSION + ":" + userToken));
-        return IMoocJSONResult.ok("退出登录成功");
+        return UnifyResponse.ok("退出登录成功");
     }
 
     @NotNull
