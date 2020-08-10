@@ -14,12 +14,14 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public UnifyResponse handleException(HttpServletRequest request, Exception exception) {
+        exception.printStackTrace();
         return UnifyResponse.errorMsg(exception.getMessage());
     }
 
     @ExceptionHandler(value = HttpException.class)
     @ResponseBody
     public UnifyResponse handleHttpException(HttpServletRequest request, HttpException exception) {
+        exception.printStackTrace();
         return UnifyResponse.errorMsg(exception.getMessage());
     }
 }
