@@ -69,7 +69,9 @@ class UserController : BasicController() {
 
 
     @GetMapping("/query")
-    fun getUserInfo(userId: String?, userToken: String?): UnifyResponse {
+    fun getUserInfo(
+            @CookieValue(value = "cookie", defaultValue = "") userToken: String?,
+            userId: String?): UnifyResponse {
         if (userId.isNullOrBlank()) {
             return UnifyResponse.errorMsg("用户id不能为空")
         }

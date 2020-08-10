@@ -34,7 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-configuration-processor:2.3.1.RELEASE")
     implementation("org.projectlombok:lombok:1.16.8")
     implementation("tk.mybatis:mapper-spring-boot-starter:2.1.5")
-    implementation("com.github.pagehelper:pagehelper-spring-boot-starter:1.2.3")
+    implementation("com.github.pagehelper:pagehelper-spring-boot-starter:1.3.0")
     implementation("commons-codec:commons-codec:1.11")
     implementation("org.apache.commons:commons-lang3:3.4")
     implementation("org.apache.commons:commons-io:1.3.2")

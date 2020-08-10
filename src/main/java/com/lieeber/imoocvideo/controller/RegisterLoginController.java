@@ -3,8 +3,8 @@ package com.lieeber.imoocvideo.controller;
 import com.lieeber.imoocvideo.pojo.Users;
 import com.lieeber.imoocvideo.pojo.vo.UsersVO;
 import com.lieeber.imoocvideo.service.UserService;
-import com.lieeber.imoocvideo.utils.UnifyResponse;
 import com.lieeber.imoocvideo.utils.MD5Utils;
+import com.lieeber.imoocvideo.utils.UnifyResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +14,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @Api(value = "用户注册和登录接口", tags = "注册和登录的controller")
@@ -26,7 +28,7 @@ public class RegisterLoginController extends BasicController {
 
     @ApiOperation(value = "用户注册", notes = "用户注册的接口")
     @PostMapping("/register")
-    public UnifyResponse register(@RequestBody Users users) throws Exception {
+    public UnifyResponse register(HttpServletResponse response, @RequestBody Users users) throws Exception {
         if (StringUtils.isBlank(users.getUsername())
                 || StringUtils.isBlank(users.getPassword())) {
             return UnifyResponse.errorMsg("用户名和密码不能为空");
@@ -44,13 +46,14 @@ public class RegisterLoginController extends BasicController {
         }
         users.setPassword("");
         UsersVO usersVO = saveToRedis(users);
+        response.addCookie(new Cookie(USER_REDIS_SESSION, usersVO.getUserToken()));
         return UnifyResponse.ok(usersVO);
     }
 
 
     @ApiOperation(value = "用户登录", notes = "用户登录的接口")
     @PostMapping("/login")
-    public UnifyResponse login(@RequestBody Users users) throws Exception {
+    public UnifyResponse login(HttpServletResponse response, @RequestBody Users users) throws Exception {
         if (StringUtils.isBlank(users.getUsername())
                 || StringUtils.isBlank(users.getPassword())) {
             return UnifyResponse.errorMsg("用户名和密码不能为空");
@@ -59,6 +62,7 @@ public class RegisterLoginController extends BasicController {
         if (responseUser != null) {
             responseUser.setPassword("");
             UsersVO usersVO = saveToRedis(responseUser);
+            response.addCookie(new Cookie(USER_REDIS_SESSION, usersVO.getUserToken()));
             return UnifyResponse.ok(usersVO);
         } else {
             return UnifyResponse.errorMsg("没有找到该用户，请确认用户名或者密码是否有误。");
@@ -67,11 +71,9 @@ public class RegisterLoginController extends BasicController {
 
 
     @ApiOperation(value = "用户注销", notes = "用户注销的接口")
-    @ApiImplicitParam(name = "userToken", value = "用户Token", required = true,
-            dataType = "String", paramType = "query")
+    @ApiImplicitParam(name = "userToken", value = "用户Token", required = true, dataType = "String", paramType = "query")
     @PostMapping("/logout")
-    public UnifyResponse logout(@RequestParam String userToken) throws Exception {
-        String userId = getRedis().get(USER_REDIS_SESSION + ":" + userToken);
+    public UnifyResponse logout(@CookieValue(value = USER_REDIS_SESSION, defaultValue = "") String userToken) {
         getRedis().del((USER_REDIS_SESSION + ":" + userToken));
         return UnifyResponse.ok("退出登录成功");
     }
