@@ -27,8 +27,8 @@ class UserController : BasicController() {
 
     @ApiOperation(value = "用户上传头像", notes = "用户上传头像的接口")
     @ApiImplicitParam(name = "userToken", value = "用户token", required = true, dataType = "String", paramType = "query")
-    @PostMapping("/upload_avatar", headers = ["content-type=multipart/form-data"])
-    fun uploadAvatar(@RequestParam userToken: String?, @ApiParam(name = "file", value = "file", required = true) @RequestParam("file") files: Array<MultipartFile>): UnifyResponse {
+    @PostMapping("upload_avatar", headers = ["content-type=multipart/form-data"])
+    fun uploadAvatar(@CookieValue(value = USER_REDIS_SESSION, defaultValue = "") userToken: String?, @ApiParam(name = "file", value = "file", required = true) @RequestParam("file") files: Array<MultipartFile>): UnifyResponse {
         if (userToken.isNullOrBlank()) {
             return UnifyResponse.errorMsg("用户没有登录，请重新登录")
         }

@@ -1,10 +1,7 @@
 package com.lieeber.imoocvideo
 
-import java.io.File
-
-
 object Constants {
-      val rootPath:String
+    val rootPath: String
         get() {
             val osName = System.getProperty("os.name")
             if (osName.startsWith("Windows")) {
@@ -15,7 +12,7 @@ object Constants {
             }
         }
 
-    val ffmpegPath:String
+    val ffmpegPath: String
         get() {
             val osName = System.getProperty("os.name")
             if (osName.startsWith("Windows")) {

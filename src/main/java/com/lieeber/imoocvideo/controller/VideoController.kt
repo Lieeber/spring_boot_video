@@ -28,15 +28,15 @@ class VideoController : BasicController() {
     lateinit var bgmService: BgmService
 
 
-    @PostMapping("/upload")
-    fun uploadVideo(userToken: String?, bgmId: String?,
+    @PostMapping("upload")
+    fun uploadVideo(@CookieValue(value = USER_REDIS_SESSION, defaultValue = "") userToken: String?, bgmId: String?,
                     videoWidth: Int?, videoHeight: Int?, desc: String?,
                     duration: Float,
                     @RequestParam("file") file: MultipartFile?): UnifyResponse {
         if (userToken.isNullOrBlank()) {
             return UnifyResponse.errorMsg("用户没有登录，请重新登录")
         }
-        val userId = redis?.get("${BasicController.USER_REDIS_SESSION}:$userToken")
+        val userId = redis?.get("$USER_REDIS_SESSION:$userToken")
         if (userId.isNullOrBlank()) {
             return UnifyResponse.errorMsg("用户登录已过期，请重新登录")
         }

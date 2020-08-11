@@ -72,7 +72,7 @@ public class RegisterLoginController extends BasicController {
 
     @ApiOperation(value = "用户注销", notes = "用户注销的接口")
     @ApiImplicitParam(name = "userToken", value = "用户Token", required = true, dataType = "String", paramType = "query")
-    @PostMapping("/logout")
+    @PostMapping("logout")
     public UnifyResponse logout(@CookieValue(value = USER_REDIS_SESSION, defaultValue = "") String userToken) {
         getRedis().del((USER_REDIS_SESSION + ":" + userToken));
         return UnifyResponse.ok("退出登录成功");
