@@ -1,6 +1,5 @@
 package com.lieeber.imoocvideo;
 
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -11,12 +10,14 @@ import java.io.File;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/**")
-		.addResourceLocations("classpath:/META-INF/resources/")
-				.addResourceLocations("file:"+Constants.INSTANCE.getRootPath()+ File.separator);
-	}
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/META-INF/resources/")
+                .addResourceLocations("file:" + Constants.INSTANCE.getRootPath() + File.separator);
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+    }
 
 //
 //	@Bean
@@ -24,8 +25,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //		return new MiniInterceptor();
 //	}
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
 //		registry.addInterceptor(miniInterceptor())
 //				.addPathPatterns("/user/**")
 //				       .addPathPatterns("/video/upload", "/video/uploadCover",
@@ -36,6 +37,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //								  .excludePathPatterns("/wxLogin");
 //
 //		WebMvcConfigurer.super.addInterceptors(registry);
-	}
+    }
 
 }
