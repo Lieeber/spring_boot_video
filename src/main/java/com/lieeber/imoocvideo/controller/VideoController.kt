@@ -68,7 +68,7 @@ class VideoController : BasicController() {
             if (bgm != null) {  //如果查询到的bgm不为空，就将视频和音频合并
                 val ffmpeg = MergeVideoMp3(ffmpegPath)
                 ffmpeg.convertor(videoFileAbsolutePath, rootPath + bgm.path,
-                        rootPath + videoRelativePath + UUID.randomUUID() + ".mp4")
+                        rootPath + videoRelativePath + UUID.randomUUID() + ".mp4",duration)
             }
         }
 
@@ -84,7 +84,7 @@ class VideoController : BasicController() {
         videos.videoHeight = videoHeight
         videos.videoWidth = videoWidth
         videos.createTime = Date()
-        videos.videoSeconds = duration.toFloat()
+        videos.videoSeconds = duration
         videos.videoPath = videoRelativePath + videoFileName
         videos.coverPath = videoRelativePath + coverFileName
         videos.videoDesc = desc

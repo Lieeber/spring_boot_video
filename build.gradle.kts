@@ -47,11 +47,12 @@ dependencies {
     implementation("org.springframework.data:spring-data-redis:2.3.1.RELEASE")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.3.2.RELEASE")
-    runtimeOnly ("mysql:mysql-connector-java:8.0.20")
+    implementation("org.springframework.boot", "spring-boot-devtools", "2.3.2.RELEASE")
+    runtimeOnly("mysql:mysql-connector-java:8.0.20")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
-    testImplementation ("org.springframework.boot:spring-boot-starter-test")
-    testImplementation ("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
@@ -69,5 +70,5 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<JavaCompile> {
-    options.encoding ="UTF-8"
+    options.encoding = "UTF-8"
 }

@@ -19,7 +19,8 @@ object Constants {
                 println(osName)
                 return "C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe"
             } else {
-                return "/usr/local/Cellar/ffmpeg/4.3_3/bin/ffmpeg"
+//                return "/usr/local/Cellar/ffmpeg/4.3_3/bin/ffmpeg"
+                return "/usr/local/Cellar/ffmpeg/bin/ffmpeg"
             }
         }
 }

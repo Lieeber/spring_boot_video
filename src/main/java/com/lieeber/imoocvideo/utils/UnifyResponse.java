@@ -63,8 +63,4 @@ public class UnifyResponse {
         this.message = "OK";
         this.data = data;
     }
-
-    public Boolean isOK() {
-        return this.code == 200;
-    }
 }
